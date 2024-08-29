@@ -17,6 +17,7 @@ const SecureStorage: StateStorage = {
 interface IAppStore {
   bears: number;
   increase: (by: number) => void;
+  reset: () => void;
 }
 
 export const useAppStore = create<IAppStore>()(
@@ -24,6 +25,7 @@ export const useAppStore = create<IAppStore>()(
     (set) => ({
       bears: 0,
       increase: (by) => set((state) => ({ bears: state.bears + by })),
+      reset: () => set((state) => ({ bears: 0 })),
     }),
     {
       name: "bear-storage",
