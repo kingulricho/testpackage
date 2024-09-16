@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/hooks/bears";
+import Paypall from "./ui/paypall";
 
 export default function Home() {
   const { bears, increase, reset } = useAppStore();
@@ -23,6 +24,8 @@ export default function Home() {
       >
         reset
       </button>
+
+      <Paypall />
     </div>
   );
 }

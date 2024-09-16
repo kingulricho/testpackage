@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.6.0",
+    "buffer-crc32": "^1.0.0",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18",
