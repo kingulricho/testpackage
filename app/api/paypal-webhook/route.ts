@@ -12,9 +12,9 @@ const paypal_transmission_id = headers().get("paypal-transmission-id");
 const paypal_cert_url = headers().get("paypal-cert-url");
 const body = await req.text();
 const paypal_auth_algo =headers().get("paypal-auth-algo");
-const webhookid=headers().get("paypal-webhook-id");
+const webhookid=headers()
 
-console.log("webhook id from headers",webhookid)
+console.log(" headers",webhookid)
 
 console.log("event",body)
   // Vérifiez que la requête provient bien de PayPal
