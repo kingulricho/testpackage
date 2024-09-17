@@ -1,32 +1,44 @@
 import crypto from "crypto"
+import crc32 from "crc/crc32"
 import { headers } from 'next/headers'
 import { NextResponse } from "next/server";
 
 
-const webhookSecret = '7Y879133UU3491006';
+const WEBHOOK_ID = '7Y879133UU3491006';
 
 export async function POST(req:Request){
-    const signature = headers().get("paypal-transmission-id");
-    const body= await req.json()
-    const rawBody = JSON.stringify(body);
-
-    const verified = crypto.createHmac('sha256', webhookSecret)
-                       .update(rawBody)
-                       .digest('hex');
-
-  if (signature === verified) {
-    // Process the webhook payload
-    console.log('Webhook received:', body);
-    // Your course fulfillment logic here
-
+    const transmissionId = headers().get("paypal-transmission-id");
+    const timeStamp = headers().get("paypal-transmission-time");
+    const paypalcerturl = headers().get("paypal-cert-url");
+    const paypaltxsig =  headers().get("paypal-transmission-sig")
+    const event = await req.text()
     
-  } else {
-    console.error('Webhook verification failed.');
-    
-  }
+    const crc = parseInt("0x" + crc32(event).toString());
+    const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
+    const certPem = await downloadAndCache(paypalcerturl!);
+    const signatureBuffer = Buffer.from(paypaltxsig!, 'base64');
+    const verifier = crypto.createVerify('SHA256');
+    verifier.update(message);
+    const isvalid= verifier.verify(certPem, signatureBuffer);
+
+    if(isvalid){
+        console.log("signature is valid")
+    }else{
+        console.log("signature not valid")
+    }
+
+   
 
   return NextResponse.json({message:"webhook received"})
 }
+
+async function downloadAndCache(url:string) {
+    // Download the file if not cached
+    const response = await fetch(url);
+    const data = await response.text()   
+    return data;
+  }
+
 
 // const bodyParser = require('body-parser');
 // const crypto = require('crypto');

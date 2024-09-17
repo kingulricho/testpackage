@@ -36,6 +36,7 @@ export default function Paypall() {
               });
               const order = await response.json();
               if (order.id) {
+                //create prisma order
                 return order.id;
               } else {
                 const errorDetail = order?.details?.[0];
