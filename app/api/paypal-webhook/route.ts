@@ -17,10 +17,11 @@ export async function POST(req:Request){
     const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
     const certPem = await downloadAndCache(paypalcerturl!);
     const signatureBuffer = Buffer.from(paypaltxsig!, 'base64');
-    console.log("sigbuf",signatureBuffer)
     const verifier = crypto.createVerify('SHA256');
     verifier.update(message);
     const isvalid= verifier.verify(certPem, signatureBuffer);
+
+    console.log("isvalid",isvalid)
 
     if(isvalid){
         console.log("signature is valid")
