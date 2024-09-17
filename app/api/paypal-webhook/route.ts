@@ -9,7 +9,7 @@ const WEBHOOK_ID = '7Y879133UU3491006';
 
 export async function POST(req: Request) {
 const paypal_transmission_id = headers().get("paypal-transmission-id");
-const paypal_cert_url = headers().get("paypal-transmission-id");
+const paypal_cert_url = headers().get("paypal-cert-url");
 const body = await req.json();
 const paypal_auth_algo =headers().get("paypal-auth-algo");
 
