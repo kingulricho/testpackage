@@ -15,6 +15,7 @@ export async function POST(req:Request){
     
     const crc = parseInt("0x" + crc32(event).toString());
     const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
+    console.log("original signed message",message)
     const certPem = await downloadAndCache(paypalcerturl!);
     const signatureBuffer = Buffer.from(paypaltxsig!, 'base64');
     const verifier = crypto.createVerify('SHA256');

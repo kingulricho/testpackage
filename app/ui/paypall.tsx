@@ -31,7 +31,7 @@ export default function Paypall() {
                 },
                 body: JSON.stringify({
                   description: "airtime purchase",
-                  price: 100,
+                  price: 10,
                 }),
               });
               const order = await response.json();
