@@ -20,7 +20,6 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@types/buffer-crc32": "^0.2.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
