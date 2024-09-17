@@ -1,5 +1,5 @@
 import crypto from "crypto"
-import crc32 from "crc/crc32"
+import * as crc32 from "buffer-crc32"
 import { headers } from 'next/headers'
 import { NextResponse } from "next/server";
 
@@ -12,9 +12,9 @@ export async function POST(req:Request){
     const paypalcerturl = headers().get("paypal-cert-url");
     const paypaltxsig =  headers().get("paypal-transmission-sig")
     const event =  await req.text()
-    console.log(event)
     
-    const crc = parseInt("0x" + crc32(event).toString());
+    const crc = parseInt("0x" + crc32(event).toString('hex'));
+    console.log("crc",crc)
     const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
     const certPem = await downloadAndCache(paypalcerturl!);
     const signatureBuffer = Buffer.from(paypaltxsig!, 'base64');
