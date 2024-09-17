@@ -11,8 +11,8 @@ export async function POST(req:Request){
     const timeStamp = headers().get("paypal-transmission-time");
     const paypalcerturl = headers().get("paypal-cert-url");
     const paypaltxsig =  headers().get("paypal-transmission-sig")
-    const event = await req.text()
-    console.log("event",event)
+    const event =  await req.text()
+    console.log(event)
     
     const crc = parseInt("0x" + crc32(event).toString());
     const message = `${transmissionId}|${timeStamp}|${WEBHOOK_ID}|${crc}`
