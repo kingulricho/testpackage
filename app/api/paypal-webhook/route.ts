@@ -19,15 +19,20 @@ export async function POST(req:Request){
     const signatureBuffer = Buffer.from(paypaltxsig!, 'base64');
     const verifier = crypto.createVerify('SHA256');
     verifier.update(message);
-    const isvalid= verifier.verify(certPem, signatureBuffer);
+    //const isvalid= verifier.verify(certPem, signatureBuffer);
 
-    console.log("isvalid",isvalid)
-
-    if(isvalid){
-        console.log("signature is valid")
-    }else{
-        console.log("signature not valid")
+    try {
+        verifier.verify(certPem, signatureBuffer);
+    } catch (error) {
+        console.log("error",error)
     }
+ //   console.log("isvalid",isvalid)
+
+    // if(isvalid){
+    //     console.log("signature is valid")
+    // }else{
+    //     console.log("signature not valid")
+    // }
 
    
 
