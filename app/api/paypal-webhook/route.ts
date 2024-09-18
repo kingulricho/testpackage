@@ -15,7 +15,16 @@ const webhook_id = '7Y879133UU3491006';
 const webhook_event = await req.text();
 
 const url = `${base}/v1/notifications/verify-webhook-signature`
-const payload = {transmission_id,transmission_time,cert_url,auth_algo,transmission_sig,webhook_id,webhook_event}
+const payload = {
+    transmission_id:transmission_id,
+    transmission_time:transmission_time,
+    cert_url:cert_url,
+    auth_algo:auth_algo,
+    transmission_sig:transmission_sig,
+    webhook_id:webhook_id,
+    webhook_event:webhook_event}
+
+    console.log("payload",payload)
 
 try {
     const accessToken = await capture();
