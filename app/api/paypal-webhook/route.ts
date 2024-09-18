@@ -27,7 +27,7 @@ const payload = {
 
     const verification = await verifysignature(payload);
     if(verification.verification_status === "SUCCESS"){
-        console.log("verification succeess")
+        console.log("webhook event",webhook_event)
         //send airtime
 
         //mark order as paid and delivered
