@@ -1,61 +1,71 @@
-import crypto from "crypto"
-import crc32 from "crc/crc32"
 import { headers } from 'next/headers'
 import { NextResponse } from "next/server";
-import { NextApiRequest, NextApiResponse } from 'next';
-
+const { PAYPAL_CLIENT_ID, PAYPAL_SECRET_KEY } = process.env;
+const base = "https://api-m.sandbox.paypal.com";
 
 const WEBHOOK_ID = '7Y879133UU3491006';
 
 export async function POST(req: Request) {
-const paypal_transmission_id = headers().get("paypal-transmission-id");
-const paypal_cert_url = headers().get("paypal-cert-url");
-const body = await req.text();
-const paypal_auth_algo =headers().get("paypal-auth-algo");
-const webhookid=headers()
+const transmission_id = headers().get("paypal-transmission-id");
+const transmission_time = headers().get("paypal-transmission-time");
+const cert_url = headers().get("paypal-cert-url");
+const transmission_sig =  headers().get("paypal-transmission-sig")
+const auth_algo =headers().get("paypal-auth-algo");
+const webhook_id = '7Y879133UU3491006';
+const webhook_event = await req.text();
 
-console.log(" headers",webhookid)
+const url = `${base}/v1/notifications/verify-webhook-signature`
+const payload = {transmission_id,transmission_time,cert_url,auth_algo,transmission_sig,webhook_id,webhook_event}
 
-console.log("event",body)
-  // Vérifiez que la requête provient bien de PayPal
-  if (!paypal_transmission_id || !paypal_cert_url) {
-    return NextResponse.json({
-        status: 400,
-        message: "missing headers",
+try {
+    const accessToken = await capture();
+    const response = await fetch(url, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+    
+        },
+        method: "POST",
+        body: JSON.stringify(payload),
       });
-  }
+      const data = await response.json();
+      console.log("data",data)
+} catch (error) {
+    console.log("error",error)
+}
 
-  // Obtenez le certificat public de PayPal
-  let cert;
-  try {
-    cert = await downloadAndCache(paypal_cert_url)
-  } catch (error) {
-    console.error('Error fetching PayPal certificate:', error);
-    return NextResponse.json({
-        status: 500,
-        message: "error fetching paypal certificate",
-      });  }
-
-  // Calculez la signature de la requête
-  const signature = crypto.createHmac('sha256', cert).update(JSON.stringify(body)).digest('hex');
-
-  // Vérifiez si la signature correspond à la signature fournie par PayPal
-  if (signature !== paypal_auth_algo) {
-    return NextResponse.json({
-        status: 400,
-        message: "invalid paypal signature",
-      });  }
-
-  // La signature est valide
-  console.log('PayPal webhook signature verified');
-
-  // Traitez la requête
-  // ...
-
-  return NextResponse.json({
+return NextResponse.json({
     status: 200,
     message: "webhook received",
-  });}
+  })
+}
+
+  // Calculez la signature de la requête
+
+
+
+  const capture = async () => {
+    try {
+      if (!PAYPAL_CLIENT_ID || !PAYPAL_SECRET_KEY) {
+        throw new Error("MISSING_API_CREDENTIALS");
+      }
+      const auth = Buffer.from(
+        PAYPAL_CLIENT_ID + ":" + PAYPAL_SECRET_KEY,
+      ).toString("base64");
+      const response = await fetch(`${base}/v1/oauth2/token`, {
+        method: "POST",
+        body: "grant_type=client_credentials",
+        headers: {
+          Authorization: `Basic ${auth}`,
+        },
+      });
+  
+      const data = await response.json();
+      return data.access_token;
+    } catch (error) {
+      console.error("Failed to generate Access Token:", error);
+    }
+  };  
 
 // export async function POST(req:Request){
 //     const transmissionId = headers().get("paypal-transmission-id");
@@ -90,10 +100,10 @@ console.log("event",body)
 //   return NextResponse.json({message:"webhook received"})
 // }
 
-async function downloadAndCache(url:string) {
-    // Download the file if not cached
-    const response = await fetch(url);
-    const data = await response.text()   
-    return data;
-  }
+// async function downloadAndCache(url:string) {
+//     // Download the file if not cached
+//     const response = await fetch(url);
+//     const data = await response.text()   
+//     return data;
+//   }
 
