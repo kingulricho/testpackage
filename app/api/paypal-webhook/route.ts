@@ -15,6 +15,7 @@ const auth_algo =headers().get("paypal-auth-algo");
 const webhook_id = '7Y879133UU3491006';
 const webhook_event = await req.json();
 
+console.log("webhook_event",webhook_event)
 
 const payload = {
     transmission_id:transmission_id,
