@@ -1,3 +1,4 @@
+import { Payload } from '@/app/libs/definitions';
 import { headers } from 'next/headers'
 import { NextResponse } from "next/server";
 const { PAYPAL_CLIENT_ID, PAYPAL_SECRET_KEY } = process.env;
@@ -14,7 +15,7 @@ const auth_algo =headers().get("paypal-auth-algo");
 const webhook_id = '7Y879133UU3491006';
 const webhook_event = await req.json();
 
-const url = `${base}/v1/notifications/verify-webhook-signature`
+
 const payload = {
     transmission_id:transmission_id,
     transmission_time:transmission_time,
@@ -24,24 +25,15 @@ const payload = {
     webhook_id:webhook_id,
     webhook_event:webhook_event}
 
-    console.log("payload",payload)
+    const verification = await verifysignature(payload);
+    if(verification.verification_status === "SUCCESS"){
+        console.log("verification succeess")
+        //send airtime
 
-try {
-    const accessToken = await capture();
-    const response = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-    
-        },
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
-      const data = await response.json();
-      console.log("data",data)
-} catch (error) {
-    console.log("error",error)
-}
+        //mark order as paid and delivered
+    }
+
+
 
 return NextResponse.json({
     status: 200,
@@ -49,7 +41,26 @@ return NextResponse.json({
   })
 }
 
-  // Calculez la signature de la requête
+const verifysignature = async(payload:Payload)=>{
+    const url = `${base}/v1/notifications/verify-webhook-signature`
+
+    try {
+        const accessToken = await capture();
+        const response = await fetch(url, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+        
+            },
+            method: "POST",
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          return data
+    } catch (error) {
+        console.log("error",error)
+    }
+}
 
 
 
