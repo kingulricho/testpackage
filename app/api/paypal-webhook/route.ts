@@ -12,7 +12,7 @@ const cert_url = headers().get("paypal-cert-url");
 const transmission_sig =  headers().get("paypal-transmission-sig")
 const auth_algo =headers().get("paypal-auth-algo");
 const webhook_id = '7Y879133UU3491006';
-const webhook_event = await req.text();
+const webhook_event = await req.json();
 
 const url = `${base}/v1/notifications/verify-webhook-signature`
 const payload = {
